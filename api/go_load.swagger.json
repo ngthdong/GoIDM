@@ -144,9 +144,9 @@
         ]
       }
     },
-    "/go_load.GoLoadService/GetDownLoadTaskFile": {
+    "/go_load.GoLoadService/GetDownloadTaskFile": {
       "post": {
-        "operationId": "GoLoadService_GetDownLoadTaskFile",
+        "operationId": "GoLoadService_GetDownloadTaskFile",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -154,13 +154,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/go_loadGetDownLoadTaskFileResponse"
+                  "$ref": "#/definitions/go_loadGetDownloadTaskFileResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/rpcStatus"
                 }
               },
-              "title": "Stream result of go_loadGetDownLoadTaskFileResponse"
+              "title": "Stream result of go_loadGetDownloadTaskFileResponse"
             }
           },
           "default": {
@@ -176,7 +176,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/go_loadGetDownLoadTaskFileRequest"
+              "$ref": "#/definitions/go_loadGetDownloadTaskFileRequest"
             }
           }
         ],
@@ -251,10 +251,22 @@
     }
   },
   "definitions": {
+    "go_loadAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "accountName": {
+          "type": "string"
+        }
+      }
+    },
     "go_loadCreateAccountRequest": {
       "type": "object",
       "properties": {
-        "username": {
+        "accountName": {
           "type": "string"
         },
         "password": {
@@ -265,7 +277,7 @@
     "go_loadCreateAccountResponse": {
       "type": "object",
       "properties": {
-        "userId": {
+        "accountId": {
           "type": "string",
           "format": "uint64"
         }
@@ -274,9 +286,6 @@
     "go_loadCreateDownloadTaskRequest": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
-        },
         "downloadType": {
           "$ref": "#/definitions/go_loadDownloadType"
         },
@@ -296,7 +305,7 @@
     "go_loadCreateSessionRequest": {
       "type": "object",
       "properties": {
-        "username": {
+        "accountName": {
           "type": "string"
         },
         "password": {
@@ -307,19 +316,17 @@
     "go_loadCreateSessionResponse": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
+        "account": {
+          "$ref": "#/definitions/go_loadAccount"
         }
       }
     },
     "go_loadDeleteDownloadTaskRequest": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
-        },
-        "downloadTask": {
-          "$ref": "#/definitions/go_loadDownloadTask"
+        "downloadTaskId": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -329,13 +336,13 @@
     "go_loadDownloadStatus": {
       "type": "string",
       "enum": [
-        "UndefinedStatus",
-        "Pending",
-        "Downloading",
-        "Failed",
-        "Success"
+        "DOWNLOAD_STATUS_UNSPECIFIED",
+        "DOWNLOAD_STATUS_PENDING",
+        "DOWNLOAD_STATUS_DOWNLOADING",
+        "DOWNLOAD_STATUS_FAILED",
+        "DOWNLOAD_STATUS_SUCCESS"
       ],
-      "default": "UndefinedStatus"
+      "default": "DOWNLOAD_STATUS_UNSPECIFIED"
     },
     "go_loadDownloadTask": {
       "type": "object",
@@ -344,8 +351,8 @@
           "type": "string",
           "format": "uint64"
         },
-        "ofUser": {
-          "$ref": "#/definitions/go_loadUser"
+        "ofAccount": {
+          "$ref": "#/definitions/go_loadAccount"
         },
         "downloadType": {
           "$ref": "#/definitions/go_loadDownloadType"
@@ -361,24 +368,21 @@
     "go_loadDownloadType": {
       "type": "string",
       "enum": [
-        "UndefinedType",
-        "HTTP"
+        "DOWNLOAD_TYPE_UNSPECIFIED",
+        "DOWNLOAD_TYPE_HTTP"
       ],
-      "default": "UndefinedType"
+      "default": "DOWNLOAD_TYPE_UNSPECIFIED"
     },
-    "go_loadGetDownLoadTaskFileRequest": {
+    "go_loadGetDownloadTaskFileRequest": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
-        },
         "downloadTaskId": {
           "type": "string",
           "format": "uint64"
         }
       }
     },
-    "go_loadGetDownLoadTaskFileResponse": {
+    "go_loadGetDownloadTaskFileResponse": {
       "type": "object",
       "properties": {
         "data": {
@@ -390,9 +394,6 @@
     "go_loadGetDownloadTaskListRequest": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
-        },
         "offset": {
           "type": "string",
           "format": "uint64"
@@ -422,9 +423,6 @@
     "go_loadUpdateDownloadTaskRequest": {
       "type": "object",
       "properties": {
-        "token": {
-          "type": "string"
-        },
         "downloadTaskId": {
           "type": "string",
           "format": "uint64"
@@ -439,18 +437,6 @@
       "properties": {
         "downloadTask": {
           "$ref": "#/definitions/go_loadDownloadTask"
-        }
-      }
-    },
-    "go_loadUser": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "username": {
-          "type": "string"
         }
       }
     },

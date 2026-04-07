@@ -25,7 +25,7 @@ const (
 	GoLoadService_GetDownloadTaskList_FullMethodName = "/go_load.GoLoadService/GetDownloadTaskList"
 	GoLoadService_UpdateDownloadTask_FullMethodName  = "/go_load.GoLoadService/UpdateDownloadTask"
 	GoLoadService_DeleteDownloadTask_FullMethodName  = "/go_load.GoLoadService/DeleteDownloadTask"
-	GoLoadService_GetDownLoadTaskFile_FullMethodName = "/go_load.GoLoadService/GetDownLoadTaskFile"
+	GoLoadService_GetDownloadTaskFile_FullMethodName = "/go_load.GoLoadService/GetDownloadTaskFile"
 )
 
 // GoLoadServiceClient is the client API for GoLoadService service.
@@ -38,7 +38,7 @@ type GoLoadServiceClient interface {
 	GetDownloadTaskList(ctx context.Context, in *GetDownloadTaskListRequest, opts ...grpc.CallOption) (*GetDownloadTaskListResponse, error)
 	UpdateDownloadTask(ctx context.Context, in *UpdateDownloadTaskRequest, opts ...grpc.CallOption) (*UpdateDownloadTaskResponse, error)
 	DeleteDownloadTask(ctx context.Context, in *DeleteDownloadTaskRequest, opts ...grpc.CallOption) (*DeleteDownloadTaskResponse, error)
-	GetDownLoadTaskFile(ctx context.Context, in *GetDownLoadTaskFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetDownLoadTaskFileResponse], error)
+	GetDownloadTaskFile(ctx context.Context, in *GetDownloadTaskFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetDownloadTaskFileResponse], error)
 }
 
 type goLoadServiceClient struct {
@@ -109,13 +109,13 @@ func (c *goLoadServiceClient) DeleteDownloadTask(ctx context.Context, in *Delete
 	return out, nil
 }
 
-func (c *goLoadServiceClient) GetDownLoadTaskFile(ctx context.Context, in *GetDownLoadTaskFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetDownLoadTaskFileResponse], error) {
+func (c *goLoadServiceClient) GetDownloadTaskFile(ctx context.Context, in *GetDownloadTaskFileRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetDownloadTaskFileResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &GoLoadService_ServiceDesc.Streams[0], GoLoadService_GetDownLoadTaskFile_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &GoLoadService_ServiceDesc.Streams[0], GoLoadService_GetDownloadTaskFile_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[GetDownLoadTaskFileRequest, GetDownLoadTaskFileResponse]{ClientStream: stream}
+	x := &grpc.GenericClientStream[GetDownloadTaskFileRequest, GetDownloadTaskFileResponse]{ClientStream: stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *goLoadServiceClient) GetDownLoadTaskFile(ctx context.Context, in *GetDo
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GoLoadService_GetDownLoadTaskFileClient = grpc.ServerStreamingClient[GetDownLoadTaskFileResponse]
+type GoLoadService_GetDownloadTaskFileClient = grpc.ServerStreamingClient[GetDownloadTaskFileResponse]
 
 // GoLoadServiceServer is the server API for GoLoadService service.
 // All implementations must embed UnimplementedGoLoadServiceServer
@@ -138,7 +138,7 @@ type GoLoadServiceServer interface {
 	GetDownloadTaskList(context.Context, *GetDownloadTaskListRequest) (*GetDownloadTaskListResponse, error)
 	UpdateDownloadTask(context.Context, *UpdateDownloadTaskRequest) (*UpdateDownloadTaskResponse, error)
 	DeleteDownloadTask(context.Context, *DeleteDownloadTaskRequest) (*DeleteDownloadTaskResponse, error)
-	GetDownLoadTaskFile(*GetDownLoadTaskFileRequest, grpc.ServerStreamingServer[GetDownLoadTaskFileResponse]) error
+	GetDownloadTaskFile(*GetDownloadTaskFileRequest, grpc.ServerStreamingServer[GetDownloadTaskFileResponse]) error
 	mustEmbedUnimplementedGoLoadServiceServer()
 }
 
@@ -167,8 +167,8 @@ func (UnimplementedGoLoadServiceServer) UpdateDownloadTask(context.Context, *Upd
 func (UnimplementedGoLoadServiceServer) DeleteDownloadTask(context.Context, *DeleteDownloadTaskRequest) (*DeleteDownloadTaskResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteDownloadTask not implemented")
 }
-func (UnimplementedGoLoadServiceServer) GetDownLoadTaskFile(*GetDownLoadTaskFileRequest, grpc.ServerStreamingServer[GetDownLoadTaskFileResponse]) error {
-	return status.Error(codes.Unimplemented, "method GetDownLoadTaskFile not implemented")
+func (UnimplementedGoLoadServiceServer) GetDownloadTaskFile(*GetDownloadTaskFileRequest, grpc.ServerStreamingServer[GetDownloadTaskFileResponse]) error {
+	return status.Error(codes.Unimplemented, "method GetDownloadTaskFile not implemented")
 }
 func (UnimplementedGoLoadServiceServer) mustEmbedUnimplementedGoLoadServiceServer() {}
 func (UnimplementedGoLoadServiceServer) testEmbeddedByValue()                       {}
@@ -299,16 +299,16 @@ func _GoLoadService_DeleteDownloadTask_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GoLoadService_GetDownLoadTaskFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GetDownLoadTaskFileRequest)
+func _GoLoadService_GetDownloadTaskFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetDownloadTaskFileRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(GoLoadServiceServer).GetDownLoadTaskFile(m, &grpc.GenericServerStream[GetDownLoadTaskFileRequest, GetDownLoadTaskFileResponse]{ServerStream: stream})
+	return srv.(GoLoadServiceServer).GetDownloadTaskFile(m, &grpc.GenericServerStream[GetDownloadTaskFileRequest, GetDownloadTaskFileResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GoLoadService_GetDownLoadTaskFileServer = grpc.ServerStreamingServer[GetDownLoadTaskFileResponse]
+type GoLoadService_GetDownloadTaskFileServer = grpc.ServerStreamingServer[GetDownloadTaskFileResponse]
 
 // GoLoadService_ServiceDesc is the grpc.ServiceDesc for GoLoadService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -344,8 +344,8 @@ var GoLoadService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "GetDownLoadTaskFile",
-			Handler:       _GoLoadService_GetDownLoadTaskFile_Handler,
+			StreamName:    "GetDownloadTaskFile",
+			Handler:       _GoLoadService_GetDownloadTaskFile_Handler,
 			ServerStreams: true,
 		},
 	},

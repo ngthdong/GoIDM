@@ -4,63 +4,72 @@ import "api/validate.proto";
 option go_package = "grpc/go_load";
 
 service GoLoadService {
-    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
-    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
-    rpc CreateDownloadTask(CreateDownloadTaskRequest) returns (CreateDownloadTaskResponse);
-    rpc GetDownloadTaskList(GetDownloadTaskListRequest) returns (GetDownloadTaskListResponse);
-    rpc UpdateDownloadTask(UpdateDownloadTaskRequest) returns (UpdateDownloadTaskResponse);
-    rpc DeleteDownloadTask(DeleteDownloadTaskRequest) returns (DeleteDownloadTaskResponse);
-    rpc GetDownLoadTaskFile(GetDownLoadTaskFileRequest) returns (stream GetDownLoadTaskFileResponse);
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {}
+    rpc CreateDownloadTask(CreateDownloadTaskRequest) returns (CreateDownloadTaskResponse) {}
+    rpc GetDownloadTaskList(GetDownloadTaskListRequest) returns (GetDownloadTaskListResponse) {}
+    rpc UpdateDownloadTask(UpdateDownloadTaskRequest) returns (UpdateDownloadTaskResponse) {}
+    rpc DeleteDownloadTask(DeleteDownloadTaskRequest) returns (DeleteDownloadTaskResponse) {}
+    rpc GetDownloadTaskFile(GetDownloadTaskFileRequest) returns (stream GetDownloadTaskFileResponse) {}
 }
 
 enum DownloadType {
-    UndefinedType = 0;
-    HTTP = 1;
+    DOWNLOAD_TYPE_UNSPECIFIED = 0;
+    DOWNLOAD_TYPE_HTTP = 1;
 }
 
 enum DownloadStatus {
-    UndefinedStatus = 0;
-    Pending = 1;
-    Downloading = 2;
-    Failed = 3;
-    Success = 4;
+    DOWNLOAD_STATUS_UNSPECIFIED = 0;
+    DOWNLOAD_STATUS_PENDING = 1;
+    DOWNLOAD_STATUS_DOWNLOADING = 2;
+    DOWNLOAD_STATUS_FAILED = 3;
+    DOWNLOAD_STATUS_SUCCESS = 4;
 }
 
-message User {
+message Account {
     uint64 id = 1;
-    string username = 2;
+    string account_name = 2;
 }
 
 message DownloadTask {
     uint64 id = 1;
-    User of_user = 2;
+    Account of_account = 2;
     DownloadType download_type = 3;
     string url = 4;
     DownloadStatus download_status = 5;
 }
 
 message CreateAccountRequest {
-    string username = 1;
-    string password = 2;
+    string account_name = 1 [(validate.rules).string = {
+        pattern:   "^[a-zA-Z0-9]{6,32}$",
+    }];
+    string password = 2 [(validate.rules).string = {
+        pattern:   "^[a-zA-Z0-9]{6,32}$",
+    }];
 }
 
 message CreateAccountResponse {
-    uint64 user_id = 1;
+    uint64 account_id = 1;
 }
 
 message CreateSessionRequest {
-    string username = 1;
-    string password = 2;
+    string account_name = 1 [(validate.rules).string = {
+        pattern:   "^[a-zA-Z0-9]{6,32}$",
+    }];
+    string password = 2 [(validate.rules).string = {
+        pattern:   "^[a-zA-Z0-9]{6,32}$",
+    }];
 }
 
 message CreateSessionResponse {
-    string token = 1;
+    Account account = 1;
 }
 
 message CreateDownloadTaskRequest {
-    string token = 1;
-    DownloadType download_type = 2;
-    string url = 3;
+    DownloadType download_type = 1;
+    string url = 2 [(validate.rules).string = {
+        max_len: 2000
+    }];
 }
 
 message CreateDownloadTaskResponse {
@@ -68,9 +77,10 @@ message CreateDownloadTaskResponse {
 }
 
 message GetDownloadTaskListRequest {
-    string token = 1;
-    uint64 offset = 2;
-    uint64 limit = 3;
+    uint64 offset = 1;
+    uint64 limit = 2 [(validate.rules).uint64 = {
+        lte: 100
+    }];
 }
 message GetDownloadTaskListResponse {
     repeated DownloadTask download_task_list = 1;
@@ -78,25 +88,24 @@ message GetDownloadTaskListResponse {
 }
 
 message UpdateDownloadTaskRequest {
-    string token = 1;
-    uint64 download_task_id = 2;
-    string url = 3;
+    uint64 download_task_id = 1;
+    string url = 2 [(validate.rules).string = {
+        uri: true,
+    }];
 }
 message UpdateDownloadTaskResponse {
     DownloadTask download_task = 1;
 }
 
 message DeleteDownloadTaskRequest {
-    string token = 1;
-    DownloadTask download_task = 2;
+    uint64 download_task_id = 1;
 }
 
 message DeleteDownloadTaskResponse {}
 
-message GetDownLoadTaskFileRequest {
-    string token = 1;
-    uint64 download_task_id = 2;
+message GetDownloadTaskFileRequest {
+    uint64 download_task_id = 1;
 }
-message GetDownLoadTaskFileResponse {
+message GetDownloadTaskFileResponse {
     bytes data = 1;
 }

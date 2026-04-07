@@ -197,9 +197,9 @@ func local_request_GoLoadService_DeleteDownloadTask_0(ctx context.Context, marsh
 	return msg, metadata, err
 }
 
-func request_GoLoadService_GetDownLoadTaskFile_0(ctx context.Context, marshaler runtime.Marshaler, client GoLoadServiceClient, req *http.Request, pathParams map[string]string) (GoLoadService_GetDownLoadTaskFileClient, runtime.ServerMetadata, error) {
+func request_GoLoadService_GetDownloadTaskFile_0(ctx context.Context, marshaler runtime.Marshaler, client GoLoadServiceClient, req *http.Request, pathParams map[string]string) (GoLoadService_GetDownloadTaskFileClient, runtime.ServerMetadata, error) {
 	var (
-		protoReq GetDownLoadTaskFileRequest
+		protoReq GetDownloadTaskFileRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -208,7 +208,7 @@ func request_GoLoadService_GetDownLoadTaskFile_0(ctx context.Context, marshaler 
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	stream, err := client.GetDownLoadTaskFile(ctx, &protoReq)
+	stream, err := client.GetDownloadTaskFile(ctx, &protoReq)
 	if err != nil {
 		return nil, metadata, err
 	}
@@ -347,7 +347,7 @@ func RegisterGoLoadServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		forward_GoLoadService_DeleteDownloadTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
-	mux.Handle(http.MethodPost, pattern_GoLoadService_GetDownLoadTaskFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_GoLoadService_GetDownloadTaskFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -495,22 +495,22 @@ func RegisterGoLoadServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		}
 		forward_GoLoadService_DeleteDownloadTask_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_GoLoadService_GetDownLoadTaskFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_GoLoadService_GetDownloadTaskFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/go_load.GoLoadService/GetDownLoadTaskFile", runtime.WithHTTPPathPattern("/go_load.GoLoadService/GetDownLoadTaskFile"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/go_load.GoLoadService/GetDownloadTaskFile", runtime.WithHTTPPathPattern("/go_load.GoLoadService/GetDownloadTaskFile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_GoLoadService_GetDownLoadTaskFile_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_GoLoadService_GetDownloadTaskFile_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_GoLoadService_GetDownLoadTaskFile_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+		forward_GoLoadService_GetDownloadTaskFile_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
@@ -522,7 +522,7 @@ var (
 	pattern_GoLoadService_GetDownloadTaskList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"go_load.GoLoadService", "GetDownloadTaskList"}, ""))
 	pattern_GoLoadService_UpdateDownloadTask_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"go_load.GoLoadService", "UpdateDownloadTask"}, ""))
 	pattern_GoLoadService_DeleteDownloadTask_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"go_load.GoLoadService", "DeleteDownloadTask"}, ""))
-	pattern_GoLoadService_GetDownLoadTaskFile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"go_load.GoLoadService", "GetDownLoadTaskFile"}, ""))
+	pattern_GoLoadService_GetDownloadTaskFile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"go_load.GoLoadService", "GetDownloadTaskFile"}, ""))
 )
 
 var (
@@ -532,5 +532,5 @@ var (
 	forward_GoLoadService_GetDownloadTaskList_0 = runtime.ForwardResponseMessage
 	forward_GoLoadService_UpdateDownloadTask_0  = runtime.ForwardResponseMessage
 	forward_GoLoadService_DeleteDownloadTask_0  = runtime.ForwardResponseMessage
-	forward_GoLoadService_GetDownLoadTaskFile_0 = runtime.ForwardResponseStream
+	forward_GoLoadService_GetDownloadTaskFile_0 = runtime.ForwardResponseStream
 )
