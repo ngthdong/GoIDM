@@ -684,6 +684,8 @@ func (m *CreateSessionResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Token
+
 	if len(errors) > 0 {
 		return CreateSessionResponseMultiError(errors)
 	}
@@ -785,6 +787,8 @@ func (m *CreateDownloadTaskRequest) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Token
 
 	// no validation rules for DownloadType
 
