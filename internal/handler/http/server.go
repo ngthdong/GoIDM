@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/ntdong/GoIDM/internal/generated/grpc/go_load"
+	"github.com/ngthdong/GoIDM/internal/generated/grpc/go_load"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

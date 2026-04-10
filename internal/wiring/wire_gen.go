@@ -8,12 +8,13 @@ package wiring
 
 import (
 	"github.com/google/wire"
-	"github.com/ntdong/GoIDM/internal/configs"
-	"github.com/ntdong/GoIDM/internal/dataaccess"
-	"github.com/ntdong/GoIDM/internal/dataaccess/database"
-	"github.com/ntdong/GoIDM/internal/handler"
-	"github.com/ntdong/GoIDM/internal/handler/grpc"
-	"github.com/ntdong/GoIDM/internal/logic"
+	"github.com/ngthdong/GoIDM/internal/configs"
+	"github.com/ngthdong/GoIDM/internal/dataaccess"
+	"github.com/ngthdong/GoIDM/internal/dataaccess/database"
+	"github.com/ngthdong/GoIDM/internal/handler"
+	"github.com/ngthdong/GoIDM/internal/handler/grpc"
+	"github.com/ngthdong/GoIDM/internal/logic"
+	"github.com/ngthdong/GoIDM/internal/utils"
 )
 
 // Injectors from wire.go:
@@ -31,10 +32,10 @@ func InitializeGRPCServer(configFilePath configs.ConfigFilePath) (grpc.Server, f
 	goquDatabase := database.InitializeGoquDB(db)
 	accountDataAccessor := database.NewAccountDatabaseAccessor(goquDatabase)
 	accountPasswordDataAccessor := database.NewAccountPasswordDataAccessor(goquDatabase)
-	account := config.Account
-	hash := logic.NewHash(account)
-	logicAccount := logic.NewAccount(goquDatabase, accountDataAccessor, accountPasswordDataAccessor, hash)
-	goLoadServiceServer := grpc.NewHandler(logicAccount)
+	auth := config.Auth
+	hash := logic.NewHash(auth)
+	account := logic.NewAccount(goquDatabase, accountDataAccessor, accountPasswordDataAccessor, hash)
+	goLoadServiceServer := grpc.NewHandler(account)
 	server := grpc.NewServer(goLoadServiceServer)
 	return server, func() {
 		cleanup()
@@ -43,4 +44,4 @@ func InitializeGRPCServer(configFilePath configs.ConfigFilePath) (grpc.Server, f
 
 // wire.go:
 
-var WireSet = wire.NewSet(configs.WireSet, dataaccess.WireSet, logic.WireSet, handler.WireSet)
+var WireSet = wire.NewSet(configs.WireSet, utils.WireSet, dataaccess.WireSet, logic.WireSet, handler.WireSet)

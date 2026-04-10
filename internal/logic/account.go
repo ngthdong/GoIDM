@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/ntdong/GoIDM/internal/dataaccess/database"
+	"github.com/ngthdong/GoIDM/internal/dataaccess/database"
 )
 
 type CreateAccountParams struct {
@@ -26,7 +26,7 @@ type CreateAccountOutput struct {
 
 type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
-	CreateSession(ctx context.Context, params CreateSessionParams) (CreateAccountOutput, error)
+	CreateSession(ctx context.Context, params CreateSessionParams) (string, error)
 }
 
 type account struct {
@@ -94,7 +94,7 @@ func (a account) CreateAccount(ctx context.Context, params CreateAccountParams) 
 			return err
 		}
 
-		return nil 
+		return nil
 	})
 
 	if txErr != nil {
@@ -102,11 +102,30 @@ func (a account) CreateAccount(ctx context.Context, params CreateAccountParams) 
 	}
 
 	return CreateAccountOutput{
-			ID:          accountID,
-			AccountName: params.AccountName,
-		}, nil
+		ID:          accountID,
+		AccountName: params.AccountName,
+	}, nil
 }
 
-func (a account) CreateSession(ctx context.Context, params CreateSessionParams) (CreateAccountOutput, error) {
-	return CreateAccountOutput{}, nil
+func (a account) CreateSession(ctx context.Context, params CreateSessionParams) (string, error) {
+	existingAccount, err := a.accountDataAccessor.GetAccountByAccountName(ctx, params.AccountName)
+	if err != nil {
+		return "", err
+	}
+
+	existingAccountPassword, err := a.accountPasswordDataAccessor.GetAccountPassword(ctx, existingAccount.AccountID)
+	if err != nil {
+		return "", err
+	}
+
+	isHashEqual, err := a.hashLogic.IsHashEqual(ctx, params.Password, existingAccountPassword.Hash)
+	if err != nil {
+		return "", err
+	}
+
+	if !isHashEqual {
+		return "", errors.New("Incorrect Password")
+	}
+
+	return "", nil
 }

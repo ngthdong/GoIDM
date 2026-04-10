@@ -13,6 +13,7 @@ type AccountPassword struct {
 
 type AccountPasswordDataAccessor interface {
 	CreateAccountPassword(ctx context.Context, accountPassword AccountPassword) error
+	GetAccountPassword(ctx context.Context, OfAccountID uint64) (AccountPassword, error)
 	UpdateAccountPassword(ctx context.Context, accountPassword AccountPassword) error
 	WithDatabase(database Database) AccountPasswordDataAccessor
 }
@@ -34,6 +35,12 @@ func (a *accountPasswordDataAccessor) CreateAccountPassword(ctx context.Context,
 	panic("unimplemented")
 }
 
+// GetAccountPassword implements AccountPasswordDataAccessor.
+func (a *accountPasswordDataAccessor) GetAccountPassword(ctx context.Context, OfAccountID uint64) (AccountPassword, error) {
+	panic("unimplemented")
+}
+
+
 // UpdateAccountPassword implements AccountPasswordDataAccessor.
 func (a *accountPasswordDataAccessor) UpdateAccountPassword(ctx context.Context, accountPassword AccountPassword) error {
 	panic("unimplemented")
@@ -43,4 +50,3 @@ func (a *accountPasswordDataAccessor) UpdateAccountPassword(ctx context.Context,
 func (a *accountPasswordDataAccessor) WithDatabase(database Database) AccountPasswordDataAccessor {
 	panic("unimplemented")
 }
-

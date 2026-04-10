@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 
-	"github.com/ntdong/GoIDM/internal/generated/grpc/go_load"
-	"github.com/ntdong/GoIDM/internal/logic"
+	"github.com/ngthdong/GoIDM/internal/generated/grpc/go_load"
+	"github.com/ngthdong/GoIDM/internal/logic"
 	"google.golang.org/grpc"
 )
 
@@ -24,8 +24,8 @@ func NewHandler(
 func (h *Handler) CreateAccount(ctx context.Context, request *go_load.CreateAccountRequest) (*go_load.CreateAccountResponse, error) {
 	output, err := h.accountLogic.CreateAccount(ctx, logic.CreateAccountParams{
 		AccountName: request.GetAccountName(),
-		Password: request.GetPassword(),
-	}) 
+		Password:    request.GetPassword(),
+	})
 	if err != nil {
 		return nil, err
 	}

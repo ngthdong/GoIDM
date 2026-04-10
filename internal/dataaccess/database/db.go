@@ -8,7 +8,7 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/ntdong/GoIDM/internal/configs"
+	"github.com/ngthdong/GoIDM/internal/configs"
 )
 
 type Database interface {

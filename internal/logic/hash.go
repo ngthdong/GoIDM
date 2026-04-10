@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/ntdong/GoIDM/internal/configs"
+	"github.com/ngthdong/GoIDM/internal/configs"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Hash interface {
@@ -14,32 +16,31 @@ type Hash interface {
 }
 
 type hash struct {
-	accountConfig configs.Account
+	authConfig configs.Auth
 }
 
-func NewHash(accountConfig configs.Account) Hash {
+func NewHash(authConfig configs.Auth) Hash {
 	return &hash{
-		accountConfig: accountConfig,
+		authConfig: authConfig,
 	}
 }
 
-// Hash implements Hash.
-func (h *hash) Hash(ctx context.Context, data string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(data), h.accountConfig.HashCost)
+func (h hash) Hash(_ context.Context, data string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(data), h.authConfig.Hash.Cost)
 	if err != nil {
-		return "", err
+		return "", status.Error(codes.Internal, "failed to hash data")
 	}
 
 	return string(hashed), nil
 }
 
-// IsHashEqual implements Hash.
-func (h *hash) IsHashEqual(ctx context.Context, data string, hashed string) (bool, error) {
+func (h hash) IsHashEqual(_ context.Context, data string, hashed string) (bool, error) {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(data)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return false, nil
 		}
-		return false, err
+
+		return false, status.Error(codes.Internal, "failed to check if data equal hash")
 	}
 
 	return true, nil

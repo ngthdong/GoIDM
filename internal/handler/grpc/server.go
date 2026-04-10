@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/validator"
-	"github.com/ntdong/GoIDM/internal/generated/grpc/go_load"
+	"github.com/ngthdong/GoIDM/internal/generated/grpc/go_load"
 	"google.golang.org/grpc"
 )
 

@@ -11,4 +11,5 @@ var WireSet = wire.NewSet(
 	wire.Bind(new(Database), new(*goqu.Database)),
 	NewAccountDatabaseAccessor,
 	NewAccountPasswordDataAccessor,
+	NewTokenPublicKeyDataAccessor,
 )

@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/google/wire"
-	"github.com/ntdong/GoIDM/internal/handler/grpc"
-	"github.com/ntdong/GoIDM/internal/handler/http"
+	"github.com/ngthdong/GoIDM/internal/handler/grpc"
+	"github.com/ngthdong/GoIDM/internal/handler/http"
 )
 
 var WireSet = wire.NewSet(
