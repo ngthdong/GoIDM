@@ -5,8 +5,12 @@ import (
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/validator"
-	"github.com/ngthdong/GoIDM/internal/generated/grpc/go_load"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+
+	"github.com/ngthdong/GoIDM/internal/configs"
+	"github.com/ngthdong/GoIDM/internal/generated/grpc/go_load"
+	"github.com/ngthdong/GoIDM/internal/utils"
 )
 
 type Server interface {
@@ -14,20 +18,29 @@ type Server interface {
 }
 
 type server struct {
-	handler go_load.GoLoadServiceServer
+	handler    go_load.GoLoadServiceServer
+	grpcConfig configs.GRPC
+	logger     *zap.Logger
 }
 
 func NewServer(
 	handler go_load.GoLoadServiceServer,
+	grpcConfig configs.GRPC,
+	logger *zap.Logger,
 ) Server {
 	return &server{
-		handler: handler,
+		handler:    handler,
+		grpcConfig: grpcConfig,
+		logger:     logger,
 	}
 }
 
-func (s *server) Start(ctx context.Context) error {
-	listener, err := net.Listen("tcp", "0.0.0.0:8080")
+func (s server) Start(ctx context.Context) error {
+	logger := utils.LoggerWithContext(ctx, s.logger)
+
+	listener, err := net.Listen("tcp", s.grpcConfig.Address)
 	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to open tcp listener")
 		return err
 	}
 
@@ -42,5 +55,7 @@ func (s *server) Start(ctx context.Context) error {
 		),
 	)
 	go_load.RegisterGoLoadServiceServer(server, s.handler)
+
+	logger.With(zap.String("address", s.grpcConfig.Address)).Info("starting grpc server")
 	return server.Serve(listener)
 }

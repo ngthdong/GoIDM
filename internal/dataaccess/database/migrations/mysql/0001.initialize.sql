@@ -1,3 +1,4 @@
+-- +migrate Up
 CREATE TABLE IF NOT EXISTS accounts (
     id BIGINT UNSIGNED AUTO_INCREMENT,
     account_name VARCHAR(256) NOT NULL,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS download_tasks (
     FOREIGN KEY (of_account_id) REFERENCES accounts(id)
 );
 
+-- +migrate Down
 DROP TABLE IF EXISTS download_tasks;
 DROP TABLE IF EXISTS token_public_keys;
 DROP TABLE IF EXISTS account_passwords;

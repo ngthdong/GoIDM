@@ -8,40 +8,78 @@ package wiring
 
 import (
 	"github.com/google/wire"
+	"github.com/ngthdong/GoIDM/internal/app"
 	"github.com/ngthdong/GoIDM/internal/configs"
 	"github.com/ngthdong/GoIDM/internal/dataaccess"
+	"github.com/ngthdong/GoIDM/internal/dataaccess/cache"
 	"github.com/ngthdong/GoIDM/internal/dataaccess/database"
+	"github.com/ngthdong/GoIDM/internal/dataaccess/mq/consumer"
 	"github.com/ngthdong/GoIDM/internal/handler"
+	"github.com/ngthdong/GoIDM/internal/handler/consumers"
 	"github.com/ngthdong/GoIDM/internal/handler/grpc"
+	"github.com/ngthdong/GoIDM/internal/handler/http"
 	"github.com/ngthdong/GoIDM/internal/logic"
 	"github.com/ngthdong/GoIDM/internal/utils"
 )
 
 // Injectors from wire.go:
 
-func InitializeGRPCServer(configFilePath configs.ConfigFilePath) (grpc.Server, func(), error) {
+func InitializeGRPCServer(configFilePath configs.ConfigFilePath) (*app.Server, func(), error) {
 	config, err := configs.NewConfig(configFilePath)
 	if err != nil {
 		return nil, nil, err
 	}
 	configsDatabase := config.Database
-	db, cleanup, err := database.InitializeDB(configsDatabase)
+	log := config.Log
+	logger, cleanup, err := utils.InitializeLogger(log)
 	if err != nil {
 		return nil, nil, err
 	}
+	db, cleanup2, err := database.InitializeAndMigrateUpDB(configsDatabase, logger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
 	goquDatabase := database.InitializeGoquDB(db)
-	accountDataAccessor := database.NewAccountDatabaseAccessor(goquDatabase)
+	configsCache := config.Cache
+	client := cache.NewRedisClient(configsCache, logger)
+	takenAccountName := cache.NewTakenAccountName(client, logger)
+	accountDataAccessor := database.NewAccountDataAccessor(goquDatabase, logger)
 	accountPasswordDataAccessor := database.NewAccountPasswordDataAccessor(goquDatabase)
 	auth := config.Auth
 	hash := logic.NewHash(auth)
-	account := logic.NewAccount(goquDatabase, accountDataAccessor, accountPasswordDataAccessor, hash)
-	goLoadServiceServer := grpc.NewHandler(account)
-	server := grpc.NewServer(goLoadServiceServer)
-	return server, func() {
+	tokenPublicKey := cache.NewTokenPublicKey(client, logger)
+	tokenPublicKeyDataAccessor := database.NewTokenPublicKeyDataAccessor(goquDatabase, logger)
+	token, err := logic.NewToken(accountDataAccessor, tokenPublicKey, tokenPublicKeyDataAccessor, auth, logger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	account := logic.NewAccount(goquDatabase, takenAccountName, accountDataAccessor, accountPasswordDataAccessor, hash, token, logger)
+	downloadTaskDataAccessor := database.NewDownloadTaskDataAccessor(goquDatabase, logger)
+	downloadTask := logic.NewDownloadTask(token, accountDataAccessor, downloadTaskDataAccessor, goquDatabase, logger)
+	goLoadServiceServer := grpc.NewHandler(account, downloadTask)
+	configsGRPC := config.GRPC
+	server := grpc.NewServer(goLoadServiceServer, configsGRPC, logger)
+	configsHTTP := config.HTTP
+	httpServer := http.NewServer(configsGRPC, configsHTTP, logger)
+	downloadTaskCreated := consumers.NewDownloadTaskCreated(downloadTask, logger)
+	mq := config.MQ
+	consumerConsumer, err := consumer.NewConsumer(mq, logger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	root := consumers.NewRoot(downloadTaskCreated, consumerConsumer, logger)
+	appServer := app.NewServer(server, httpServer, root, logger)
+	return appServer, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }
 
 // wire.go:
 
-var WireSet = wire.NewSet(configs.WireSet, utils.WireSet, dataaccess.WireSet, logic.WireSet, handler.WireSet)
+var WireSet = wire.NewSet(configs.WireSet, utils.WireSet, dataaccess.WireSet, logic.WireSet, handler.WireSet, app.WireSet)

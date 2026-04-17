@@ -9,6 +9,10 @@ cache:
   address: "127.0.0.1:6379"
   username: ""
   password: ""
+mq:
+  addresses:
+    - "localhost:9092"
+  client_id: "goidm"
 auth:
   hash:
     cost: 10
